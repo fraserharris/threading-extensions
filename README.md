@@ -8,17 +8,18 @@ Example using `run`:
 
     class DoSomethingThread(StoppableThread):
         def run(self):
+            # self._stop is an instance of <threading.Event>
             while not self._stop.is_set():
                 do_something()
-                # use this in place of time.sleep b/c wait is interrupted by stop events
-                # and will immediately exit
+                # use `_stop.wait` in place of `time.sleep` b/c wait is interrupted
+                # the event being set and will immediately exit
                 self._stop.wait(10)
     
     dt = DoSomethingThread()
     dt.start()
     assert(dt.is_alive() is True)
-    assert(dt.stopped is False)
-    dt.stop()
+    assert(dt.stopped is False) # stopped is a property
+    dt.stop() # stop() sets the stop event in the thread
     assert(dt.is_alive() is False)
     assert(dt.stopped is True)
 
