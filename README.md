@@ -22,16 +22,17 @@ Example using `run`:
     assert(dt.is_alive() is False)
     assert(dt.stopped is True)
 
-Example using `target` and `args`:
+Example using `target`, `args` and `kwargs`:
 
-    def run_in_stoppable_thread(stop_event):
+    def infinite_running_target(x, stop_event, y=None):
+       # x & y are examples
         while not stop_event.is_set():
             do_something()
             # use this in place of time.sleep b/c wait is interrupted by stop events
             # and will immediately exit
-            stop_event.wait(10)
+            stop_event.wait(1)
     
-    st = StoppableThread(target=run_in_stoppable_thread, args=(,))
+    st = StoppableThread(target=infinite_running_target, args=(1,), kwargs={"y": 2})
     st.start()
     assert(st.is_alive() is True)
     assert(st.stopped is False)
@@ -40,9 +41,9 @@ Example using `target` and `args`:
     assert(st.stopped is True)
 
 # ExceptionThread
-Thread that propogates exceptions raised in the thread to the main context on `join`.  To properly work, use the `run_with_exception` method in place of `run`.
+Thread that propogates exceptions raised in the thread to the main context on `join`.  To properly work using the class method `run`, implement `run_with_exception` method instead.
 
-Example:
+Example using `run_with_exception`:
 
     class RaiseThread(ExceptionThread):
         def run_with_exception(self):
@@ -52,9 +53,19 @@ Example:
     rt.start()
     rt.join() # ValueError: 'eep!'
 
+Example using `target`, `args` and `kwargs`:
+
+    def raises_exception_target(x, y=None):
+        # x & y are examples
+        raise ValueError('eep!')
+    
+    et = Thread(target=raises_exception_target, args=(1,), kwargs={"y": 2})
+    et.start()
+    et.join() # ValueError: 'eep!'
+
 # StoppableExceptionThread
 Thread that is both stoppable AND propogates exceptions to the main context on `join`. To properly work, use the `run_with_exceptions` method in place of `run`.
 
 See above examples.
 
-TODO: enable `target` and `args` initialization in place of `run_with_exceptions`.
+Happy Threading!
