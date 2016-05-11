@@ -6,8 +6,11 @@ import Queue
 class StoppableThread(Thread):
     """
     Thread with internal stop event.  To properly work, the `run` method or `target` function
-    MUST check for changes in the stop event.  If using `target`, the stop <threading.Event>
-    will be passed in as the last argument.
+    MUST check for changes in the stop event.
+
+    If using `run` method, periodically check if <threading.Event> `self._stop` is set: `self._stop.is_set()`.
+
+    If using `target` argument, a <threading.Event> will be passed in as the last positional argument.
     """
     def __init__(self, *args, **kwargs):
         self._stop = Event()
@@ -50,19 +53,17 @@ class ExceptionThread(Thread):
         self._status_queue.put(None)
 
     def join(self, timeout=None):
-        if self.is_alive():
-            super(ExceptionThread, self).join(timeout=timeout)
-            ex_info = self._status_queue.get()
-        else:
-            # thread already finished
-            try:
-                ex_info = self._status_queue.get_nowait()
-            except Queue.Empty:
-                ex_info = None
-        if ex_info is None:
+        super(ExceptionThread, self).join(timeout=timeout)
+        try:
+            ex_info = self._status_queue.get_nowait()
+        except Queue.Empty:
+            # Either a timeout or join is being called again
             return
         else:
-            raise ex_info[1]
+            if ex_info is None:
+                return
+            else:
+                raise ex_info[1]
 
 
 class StoppableExceptionThread(StoppableThread, ExceptionThread):
