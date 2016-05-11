@@ -64,7 +64,7 @@ Example using `target`, `args` and `kwargs`:
     et.join() # ValueError: 'eep!'
 
 # StoppableExceptionThread
-Thread that is both stoppable AND propogates exceptions to the main context on `join`. To properly work, use the `run_with_exceptions` method in place of `run`.
+Thread that is both stoppable AND propogates exceptions to the main context on `join`. To properly work using the class method `run`, implement `run_with_exception` method instead.
 
 See above examples.
 
