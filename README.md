@@ -1,10 +1,7 @@
 # threading-extensions
-Python Thread extensions
-
 Some useful, well-tested extensions of threading.Thread
 
 # StoppableThread
-
 Thread with internal stop event.  To properly work, the `run` method or `target` function MUST check for changes in the stop event.  If using `target`, the stop event will be passed in as the last argument.
 
 Example using `run`:
@@ -43,7 +40,6 @@ Example using `target` and `args`:
     assert(st.stopped is True)
 
 # ExceptionThread
-
 Thread that propogates exceptions raised in the thread to the main context on `join`.  To properly work, use the `run_with_exception` method in place of `run`.
 
 Example:
@@ -57,7 +53,6 @@ Example:
     rt.join() # ValueError: 'eep!'
 
 # StoppableExceptionThread
-
 Thread that is both stoppable AND propogates exceptions to the main context on `join`. To properly work, use the `run_with_exceptions` method in place of `run`.
 
 See above examples.
