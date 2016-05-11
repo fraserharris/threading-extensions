@@ -29,6 +29,8 @@ class ExceptionThread(Thread):
     """
     Thread that raises exceptions in the main loop.  To properly work, use the
     `run_with_exception` method in place of `run`
+    
+    Credit for initial implementation: Mateusz Kobos with http://stackoverflow.com/a/6874161/191442
     """
     def __init__(self, *args, **kwargs):
         super(ExceptionThread, self).__init__(*args, **kwargs)
