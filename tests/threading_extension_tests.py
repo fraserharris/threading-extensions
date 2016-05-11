@@ -1,9 +1,9 @@
 from multiprocessing import Value
 from nose.tools import assert_equals, assert_greater
-from time import sleep
+from time import sleep, time
 import unittest
 
-from threading_extensions import StoppableThread, ExceptionThread, StoppableExceptionThread
+from utils.threading import StoppableThread, ExceptionThread, StoppableExceptionThread
 
 
 class StoppableThreadTests(unittest.TestCase):
@@ -112,6 +112,10 @@ class ExceptionTheadTests(unittest.TestCase):
         def run_with_exception(self):
             raise ValueError('eep!')
 
+    class TwoSecondThread(ExceptionThread):
+        def run_with_exception(self):
+            sleep(2.0)
+
     def no_exceptions_test(self):
         pt = self.PassThread()
         pt.start()
@@ -144,6 +148,15 @@ class ExceptionTheadTests(unittest.TestCase):
         assert_equals(pt.is_alive(), False)
         pt.join()
         assert_equals(pt.is_alive(), False)
+
+    def timeout_test(self):
+        """  joing should respect timeout parameter """
+        pt = self.TwoSecondThread()
+        pt.start()
+        t = time()
+        pt.join(timeout=1.0)
+        assert_greater(1.01, time() - t) # allow 10 ms for overhead
+        assert_equals(pt.is_alive(), True)
 
 
 class StoppableExceptionTheadTests(unittest.TestCase):
@@ -223,6 +236,24 @@ class StoppableExceptionTheadTests(unittest.TestCase):
         with x.get_lock():
             assert_equals(x.value, 6)
 
+    def run_with_exception_timeout_test(self):
+        """ Subclass StopabbleExceptionThrad with long running `run_with_exception` """
+        class InfiniteThread(StoppableExceptionThread):
+            def run_with_exception(self):
+                while not self._stop.is_set():
+                    self._stop.wait(1.0)
+
+        st = InfiniteThread()
+        st.start()
+        t = time()
+        st.join(timeout=1.0)
+        assert_greater(1.01, time() - t) # allow 10 ms for overhead
+        assert_equals(st.stopped, False)
+        assert_equals(st.is_alive(), True)
+        st.stop()
+        st.join()
+        assert_equals(st.is_alive(), False)
+
     def target_finishes_test(self):
         """ run target function """
 
@@ -298,3 +329,21 @@ class StoppableExceptionTheadTests(unittest.TestCase):
         assert_equals(st.is_alive(), False)
         with x.get_lock():
             assert_equals(x.value, 6)
+
+    def target_timeout_test(self):
+        """ joing with timeout should gracefully continue """
+        def infinite_target(stop_event):
+            while not stop_event.is_set():
+                stop_event.wait(1)
+
+        st = StoppableExceptionThread(target=infinite_target)
+        st.start()
+        t = time()
+        st.join(timeout=1.0)
+        assert_greater(1.01, time() - t) # allow 10 ms for overhead
+        assert_equals(st.stopped, False)
+        assert_equals(st.is_alive(), True)
+        st.stop()
+        st.join()
+        assert_equals(st.stopped, True)
+        assert_equals(st.is_alive(), False)
