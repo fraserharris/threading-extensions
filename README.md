@@ -12,7 +12,7 @@ Example using `run`:
             while not self._stop.is_set():
                 do_something()
                 # use `_stop.wait` in place of `time.sleep` b/c wait is interrupted
-                # the event being set and will immediately exit
+                # by the event being set and will immediately exit
                 self._stop.wait(10)
     
     dt = DoSomethingThread()
