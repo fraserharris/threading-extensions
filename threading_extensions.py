@@ -6,15 +6,15 @@ import Queue
 class StoppableThread(Thread):
     """
     Thread with internal stop event.  To properly work, the `run` method or `target` function
-    MUST check for changes in the stop event.  If using `target`, the stop event
+    MUST check for changes in the stop event.  If using `target`, the stop <threading.Event>
     will be passed in as the last argument.
     """
     def __init__(self, *args, **kwargs):
         self._stop = Event()
         if kwargs.get('target') is not None:
-            # old style threads run `target` function with arguments `args`
-            # add stop_event as the last argument
-            kwargs['args'] = tuple(kwargs.get('args', lambda x: list()),) + (self._stop,)
+            # for threads initialized with a `target` function
+            # add stop event as the last calling argument
+            kwargs['args'] = kwargs.get('args', tuple()) + (self._stop,)
         super(StoppableThread, self).__init__(*args, **kwargs)
 
     def stop(self):
@@ -27,10 +27,8 @@ class StoppableThread(Thread):
 
 class ExceptionThread(Thread):
     """
-    Thread that raises exceptions in the main loop.  To properly work, use the
+    Thread that raises exceptions in the main context.  To properly work, use the
     `run_with_exception` method in place of `run`
-    
-    Credit for initial implementation: Mateusz Kobos with http://stackoverflow.com/a/6874161/191442
     """
     def __init__(self, *args, **kwargs):
         super(ExceptionThread, self).__init__(*args, **kwargs)
@@ -43,7 +41,10 @@ class ExceptionThread(Thread):
     def run(self):
         """This method should NOT be overriden."""
         try:
-            self.run_with_exception()
+            if self._Thread__target:
+                super(ExceptionThread, self).run()
+            else:
+                self.run_with_exception()
         except BaseException:
             self._status_queue.put(sys.exc_info())
         self._status_queue.put(None)
@@ -64,14 +65,13 @@ class ExceptionThread(Thread):
             raise ex_info[1]
 
 
-class StoppableExceptionThread(ExceptionThread, StoppableThread):
+class StoppableExceptionThread(StoppableThread, ExceptionThread):
     """
     Thread that can be stopped and propogates exceptions from `join`
-    To work properly, `run_with_exception` MUST check for changes in the stop event
-    
-    TODO: add support for `target`/`args` initialization
+    To work properly, `run_with_exception` method or `target` argument
+    MUST check for changes in the stop event
     """
     def __init__(self, *args, **kwargs):
-        """ Set up StoppableThread """
-        self._stop = Event()
         super(StoppableExceptionThread, self).__init__(*args, **kwargs)
+        # Set up for ExceptionThread
+        self._status_queue = Queue.Queue()
