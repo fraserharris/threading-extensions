@@ -2,7 +2,9 @@
 Some useful, well-tested extensions of threading.Thread
 
 # StoppableThread
-Thread with internal stop event.  To properly work, the `run` method or `target` function MUST check for changes in the stop event.  If using `target`, the stop event will be passed in as the last argument.
+Thread with internal stop event.  To properly work, the `run` method or `target` function MUST check for changes in the stop event.
+- If using `run` method, periodically check if <threading.Event> `self._stop` is set: `self._stop.is_set()`
+- If using `target` argument, a <threading.Event> will be passed in as the last positional argument.
 
 Example using `run`:
 
@@ -42,7 +44,7 @@ Example using `target`, `args` and `kwargs`:
     assert(st.stopped is True)
 
 # ExceptionThread
-Thread that propogates exceptions raised in the thread to the main context on `join`.  To properly work using the class method `run`, implement `run_with_exception` method instead.
+Thread that propogates exceptions raised in the thread to the main context on `join`.  To properly work using the method `run`, implement `run_with_exception` method instead.
 
 Example using `run_with_exception`:
 
