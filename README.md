@@ -24,7 +24,7 @@ Example using `run`:
     assert(dt.stopped is False) # stopped is a property
     
     dt.stop() # sets the stop event in the thread
-    dt.join() # wait until thread finishes
+    dt.join() # wait until thread returns
     
     assert(dt.is_alive() is False)
     assert(dt.stopped is True)
