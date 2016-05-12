@@ -35,8 +35,8 @@ Thread with internal stop event.  To properly work, the `run` method or `target`
        # x & y are examples
         while not stop_event.is_set():
             do_something()
-            # use this in place of time.sleep b/c wait is interrupted by stop events
-            # and will immediately exit
+            # use `stop_event.wait` in place of `time.sleep` b/c wait is interrupted by
+            # stop being set and will immediately exit the wait
             stop_event.wait(1)
     
     st = StoppableThread(target=infinite_running_target, args=(1,), kwargs={"y": 2})
