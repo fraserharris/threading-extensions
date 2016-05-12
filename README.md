@@ -1,4 +1,4 @@
-# threading-extensions
+# threading_extensions
 Some useful, well-tested extensions of threading.Thread
 
 # StoppableThread
