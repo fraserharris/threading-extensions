@@ -19,9 +19,13 @@ Example using `run`:
     
     dt = DoSomethingThread()
     dt.start()
+    
     assert(dt.is_alive() is True)
     assert(dt.stopped is False) # stopped is a property
-    dt.stop() # stop() sets the stop event in the thread
+    
+    dt.stop() # sets the stop event in the thread
+    dt.join() # wait until thread finishes
+    
     assert(dt.is_alive() is False)
     assert(dt.stopped is True)
 
@@ -37,9 +41,13 @@ Example using `target`, `args` and `kwargs`:
     
     st = StoppableThread(target=infinite_running_target, args=(1,), kwargs={"y": 2})
     st.start()
+    
     assert(st.is_alive() is True)
     assert(st.stopped is False)
+    
     st.stop()
+    st.join()
+    
     assert(st.is_alive() is False)
     assert(st.stopped is True)
 
@@ -65,6 +73,8 @@ Example using `target`, `args` and `kwargs`:
     et = Thread(target=raises_exception_target, args=(1,), kwargs={"y": 2})
     et.start()
     et.join() # ValueError: 'eep!'
+    
+    assert(et.is_alive() is False)
 
 # StoppableExceptionThread
 Thread that is both stoppable AND propogates exceptions to the main context on `join`. To properly work using the class method `run`, implement `run_with_exception` method instead.
