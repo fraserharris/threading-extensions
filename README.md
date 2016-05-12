@@ -1,7 +1,6 @@
 # threading_extensions
 Some useful, well-tested extensions of threading.Thread.  Tested for Python 2.7
 
-# Classes
 ## StoppableThread
 Thread with internal stop event.  To properly work, the `run` method or `target` function MUST check for changes in the stop event.
 - If using `run` method, periodically check if <threading.Event> `self._stop` is set: `self._stop.is_set()`
