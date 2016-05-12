@@ -1,12 +1,13 @@
 # threading_extensions
-Some useful, well-tested extensions of threading.Thread
+Some useful, well-tested extensions of threading.Thread.  Tested for Python 2.7
 
-# StoppableThread
+# Classes
+## StoppableThread
 Thread with internal stop event.  To properly work, the `run` method or `target` function MUST check for changes in the stop event.
 - If using `run` method, periodically check if <threading.Event> `self._stop` is set: `self._stop.is_set()`
 - If using `target` argument, a <threading.Event> will be passed in as the last positional argument.
 
-Example using `run`:
+#### Example using `run`:
 
     class DoSomethingThread(StoppableThread):
         def run(self):
@@ -29,7 +30,7 @@ Example using `run`:
     assert(dt.is_alive() is False)
     assert(dt.stopped is True)
 
-Example using `target`, `args` and `kwargs`:
+#### Example using `target`, `args` and `kwargs`:
 
     def infinite_running_target(x, stop_event, y=None):
        # x & y are examples
@@ -51,10 +52,10 @@ Example using `target`, `args` and `kwargs`:
     assert(st.is_alive() is False)
     assert(st.stopped is True)
 
-# ExceptionThread
+## ExceptionThread
 Thread that propogates exceptions raised in the thread to the main context on `join`.  To properly work using the method `run`, implement `run_with_exception` method instead.
 
-Example using `run_with_exception`:
+#### Example using `run_with_exception`:
 
     class RaiseThread(ExceptionThread):
         def run_with_exception(self):
@@ -64,7 +65,7 @@ Example using `run_with_exception`:
     rt.start()
     rt.join() # ValueError: 'eep!'
 
-Example using `target`, `args` and `kwargs`:
+#### Example using `target`, `args` and `kwargs`:
 
     def raises_exception_target(x, y=None):
         # x & y are examples
@@ -76,9 +77,12 @@ Example using `target`, `args` and `kwargs`:
     
     assert(et.is_alive() is False)
 
-# StoppableExceptionThread
+## StoppableExceptionThread
 Thread that is both stoppable AND propogates exceptions to the main context on `join`. To properly work using the class method `run`, implement `run_with_exception` method instead.
 
 See above examples.
+
+# Installation
+`pip install https://github.com/fraserharris/threading-extensions/archive/master.zip`
 
 Happy Threading!
