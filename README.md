@@ -4,7 +4,7 @@ Some useful, well-tested extensions of [threading.Thread](https://docs.python.or
 ## StoppableThread
 Thread with internal stop event.  To properly work, the `run` method or `target` function MUST check for changes in the stop [threading.Event](https://docs.python.org/2/library/threading.html#event-objects).
 - If using `run` method, periodically check if <threading.Event> `self._stop` is set: `self._stop.is_set()`
-- If using `target` argument, the stop threading.Event will be passed in as the last positional argument.
+- If using `target` argument, the stop `threading.Event` will be passed in as the last positional argument.
 
 #### Example using `run`:
 
