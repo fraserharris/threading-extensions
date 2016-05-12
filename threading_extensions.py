@@ -63,7 +63,7 @@ class ExceptionThread(Thread):
             if ex_info is None:
                 return
             else:
-                raise ex_info[1]
+                raise ex_info[0], ex_info[1], ex_info[2]
 
 
 class StoppableExceptionThread(StoppableThread, ExceptionThread):
