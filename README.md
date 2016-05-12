@@ -3,8 +3,8 @@ Some useful, well-tested extensions of [threading.Thread](https://docs.python.or
 
 ## StoppableThread
 Thread with internal stop event.  To properly work, the `run` method or `target` function MUST check for changes in the stop [threading.Event](https://docs.python.org/2/library/threading.html#event-objects).
-- If using `run` method, periodically check if <threading.Event> `self._stop` is set: `self._stop.is_set()`
-- If using `target` argument, the stop `threading.Event` will be passed in as the last positional argument.
+- If using `run` class method, periodically check if <threading.Event> `self._stop` is set: `self._stop.is_set()`
+- If using `target` function keyword argument, the stop `threading.Event` will be passed in as the *last* positional argument.
 
 #### Example using `run`:
 
@@ -52,7 +52,7 @@ Thread with internal stop event.  To properly work, the `run` method or `target`
     assert(st.stopped is True)
 
 ## ExceptionThread
-Thread that propogates exceptions raised in the thread to the main context on `join`.  To properly work using the method `run`, implement `run_with_exception` method instead.
+Thread that propogates exceptions raised in the thread to the main context on `join`.  To properly work using the class method `run`, implement `run_with_exception` method instead.
 
 #### Example using `run_with_exception`:
 
@@ -62,7 +62,7 @@ Thread that propogates exceptions raised in the thread to the main context on `j
     
     rt = RaiseThread()
     rt.start()
-    rt.join() # ValueError: 'eep!'
+    rt.join() # ValueError: 'eep!', with complete stack trace
 
 #### Example using `target`, `args` and `kwargs`:
 
@@ -72,7 +72,7 @@ Thread that propogates exceptions raised in the thread to the main context on `j
     
     et = Thread(target=raises_exception_target, args=(1,), kwargs={"y": 2})
     et.start()
-    et.join() # ValueError: 'eep!'
+    et.join() # ValueError: 'eep!', with complete stack trace
     
     assert(et.is_alive() is False)
 
