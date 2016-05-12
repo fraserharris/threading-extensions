@@ -1,5 +1,5 @@
 # threading_extensions
-Some useful, well-tested extensions of threading.Thread.  Tested for Python 2.7
+Some useful, well-tested extensions of [threading.Thread](https://docs.python.org/2/library/threading.html#thread-objects).  Tested for Python 2.7.
 
 ## StoppableThread
 Thread with internal stop event.  To properly work, the `run` method or `target` function MUST check for changes in the stop event.
